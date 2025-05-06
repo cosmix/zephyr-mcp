@@ -285,7 +285,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 
 Here are a few examples of how to use these tools:
 
-```json
+```
 // Get a list of all projects
 {
   "tool_name": "list_projects",
@@ -343,3 +343,7 @@ Here are a few examples of how to use these tools:
   }
 }
 ```
+
+## LICENCE
+
+This project is licensed under the MIT License - see the [LICENCE](LICENCE) file for details.
