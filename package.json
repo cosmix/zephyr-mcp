@@ -1,0 +1,28 @@
+{
+  "name": "zephyr-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Zephyr Scale integration providing test management capabilities",
+  "type": "module",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "vite build && chmod +x build/index.js",
+    "start": "bun run build/index.js",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "keywords": ["mcp", "zephyr", "test-management", "jira"],
+  "author": "Dimosthenis Kaponis",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.12",
+    "@types/node": "^22.15.12",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3"
+  },
+  "peerDependencies": {}
+}

@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "ESNext",
+
+    // Module settings
+    "moduleResolution": "bundler",
+    "esModuleInterop": true, // Added from reference
+
+    // Build settings
+    "outDir": "build", // Added from reference
+    "rootDir": "src", // Added from reference
+    "declaration": true, // Added from reference
+    "isolatedModules": true, // Added from reference
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true, // Kept
+    "noUncheckedIndexedAccess": true, // Kept
+
+    // Some stricter flags (kept as false)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Project-specific types
+    "types": ["vitest/globals", "@types/bun"] // Kept
+  },
+  "include": ["src/**/*"], // Added from reference
+  "exclude": ["node_modules", "build"] // Added from reference
+}
