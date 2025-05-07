@@ -3,10 +3,9 @@ import type {
   Folder,
   FolderInput,
   FolderList,
-} from "../../types/zephyr/folder"; 
+} from "../../types/zephyr/folder";
 
 export class FolderService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }

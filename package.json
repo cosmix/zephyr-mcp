@@ -11,7 +11,12 @@
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
-  "keywords": ["mcp", "zephyr", "test-management", "jira"],
+  "keywords": [
+    "mcp",
+    "zephyr",
+    "test-management",
+    "jira"
+  ],
   "author": "Dimosthenis Kaponis",
   "license": "MIT",
   "dependencies": {
@@ -19,7 +24,7 @@
   },
   "devDependencies": {
     "@types/bun": "^1.2.12",
-    "@types/node": "^22.15.12",
+    "@types/node": "^22.15.15",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.1.3"

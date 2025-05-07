@@ -7,7 +7,6 @@ import type {
 import { ZephyrBaseService } from "./base-service";
 
 export class TestCycleService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }
@@ -15,7 +14,7 @@ export class TestCycleService extends ZephyrBaseService {
   async getTestCycle(testCycleIdOrKey: string): Promise<TestCycle> {
     const response = await this.request<TestCycle>(
       "GET",
-      `/testcycles/${testCycleIdOrKey}`, 
+      `/testcycles/${testCycleIdOrKey}`,
     );
     return response;
   }
@@ -28,7 +27,7 @@ export class TestCycleService extends ZephyrBaseService {
   }): Promise<TestCycleList> {
     const response = await this.request<TestCycleList>(
       "GET",
-      "/testcycles", 
+      "/testcycles",
       undefined,
       params,
     );
@@ -38,7 +37,7 @@ export class TestCycleService extends ZephyrBaseService {
   async createTestCycle(testCycleInput: TestCycleInput): Promise<TestCycle> {
     const response = await this.request<TestCycle>(
       "POST",
-      "/testcycles", 
+      "/testcycles",
       testCycleInput,
     );
     return response;
@@ -50,7 +49,7 @@ export class TestCycleService extends ZephyrBaseService {
   ): Promise<TestCycle> {
     const response = await this.request<TestCycle>(
       "PUT",
-      `/testcycles/${testCycleIdOrKey}`, 
+      `/testcycles/${testCycleIdOrKey}`,
       testCycleInput,
     );
     return response;

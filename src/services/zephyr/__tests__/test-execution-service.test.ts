@@ -55,7 +55,10 @@ describe("TestExecutionService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
-    testExecutionService = new TestExecutionService(mockApiKey, "https://mock-zephyr-api.com");
+    testExecutionService = new TestExecutionService(
+      mockApiKey,
+      "https://mock-zephyr-api.com",
+    );
   });
 
   describe("getTestExecution", () => {

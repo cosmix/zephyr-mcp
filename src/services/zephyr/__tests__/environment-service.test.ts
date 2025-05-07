@@ -22,10 +22,8 @@ describe("EnvironmentService", () => {
     environmentService = new EnvironmentService(mockApiKey, mockBaseUrl);
   });
 
-
   describe("listEnvironments", () => {
     it("should fetch a list of environments successfully with default params", async () => {
-
       const mockEnvironmentList = {
         total: 1,
         offset: 0,
@@ -45,13 +43,12 @@ describe("EnvironmentService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "GET",
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
         }),
-       );
+      );
 
       expect(result).toEqual(mockEnvironmentList);
     });
@@ -77,7 +74,6 @@ describe("EnvironmentService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "GET",
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,

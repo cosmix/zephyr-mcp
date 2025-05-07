@@ -59,11 +59,13 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Test Case Tools
 
 - **`get_test_case`**: Get a specific test case by its key.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case (e.g., PROJ-T123)
   - Returns both test case info and test steps in a single response.
 
 - **`list_test_cases`**: List test cases with optional filtering by project, folder, or Jira issue.
+
   - Optional parameters:
     - `projectKey` (string): Key of the project (e.g., PROJ)
     - `folderId` (number): Numeric ID of the folder
@@ -71,6 +73,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - Pagination parameters (e.g., `maxResults`, `startAt`) are supported
 
 - **`create_test_case`**: Create a new test case.
+
   - Required parameters:
     - `name` (string): Name of the test case
     - `projectKey` (string): Key of the project
@@ -86,6 +89,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `testSteps` (object): Test steps information
 
 - **`update_test_case`**: Update an existing test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case to update
   - Optional parameters:
@@ -101,15 +105,18 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `testSteps` (object): Updated test steps
 
 - **`get_test_case_links`**: Get links associated with a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
 
 - **`create_test_case_issue_link`**: Create an issue link for a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
     - `issueKey` (string): The key of the issue to link
 
 - **`create_test_case_web_link`**: Create a web link for a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
     - `url` (string): The URL to link
@@ -117,10 +124,12 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `description` (string): Description of the link
 
 - **`get_test_case_test_script`**: Get the test script for a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
 
 - **`create_test_case_test_script`**: Create or update the test script for a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
     - `type` (string): The type of test script (one of: "STEP_BY_STEP", "BDD", "PLAIN")
@@ -129,6 +138,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `steps` (array): Array of test steps
 
 - **`get_test_case_test_steps`**: Get the test steps for a test case.
+
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
 
@@ -140,10 +150,12 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Test Cycle Tools
 
 - **`get_test_cycle`**: Get a specific test cycle by its ID or key.
+
   - Required parameters:
     - `testCycleIdOrKey` (string): The ID or key of the test cycle
 
 - **`list_test_cycles`**: List test cycles with optional filtering.
+
   - Optional parameters:
     - `projectKey` (string): Key of the project
     - `folderId` (number): ID of the folder
@@ -151,6 +163,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - Pagination parameters (e.g., `maxResults`, `startAt`) are supported
 
 - **`create_test_cycle`**: Create a new test cycle.
+
   - Required parameters:
     - `name` (string): Name of the test cycle
     - `projectKey` (string): Key of the project
@@ -179,10 +192,12 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Test Execution Tools
 
 - **`get_test_execution`**: Get a specific test execution by its ID or key.
+
   - Required parameters:
     - `testExecutionIdOrKey` (string): The ID or key of the test execution
 
 - **`list_test_executions`**: List test executions with optional filtering.
+
   - Optional parameters:
     - `projectKey` (string): Key of the project
     - `testCaseKey` (string): Key of the test case
@@ -194,6 +209,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - Pagination parameters (e.g., `maxResults`, `startAt`) are supported
 
 - **`create_test_execution`**: Create a new test execution.
+
   - Required parameters:
     - `projectKey` (string): Key of the project
     - `testCaseKey` (string): Key of the test case
@@ -208,6 +224,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `testSteps` (object): Test steps information
 
 - **`update_test_execution`**: Update an existing test execution.
+
   - Required parameters:
     - `testExecutionIdOrKey` (string): The ID or key of the test execution to update
   - Optional parameters:
@@ -220,6 +237,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
     - `testSteps` (object): Updated test steps
 
 - **`get_test_execution_test_steps`**: Get the test steps for a test execution.
+
   - Required parameters:
     - `testExecutionIdOrKey` (string): The ID or key of the test execution
 
@@ -231,6 +249,7 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Project Tools
 
 - **`get_project`**: Get a specific project by its ID or key.
+
   - Required parameters:
     - `projectIdOrKey` (string): The ID or key of the project
 
@@ -241,10 +260,12 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Folder Tools
 
 - **`get_folder`**: Get a specific folder by its ID.
+
   - Required parameters:
     - `folderId` (number): The ID of the folder
 
 - **`list_folders`**: List folders with optional filtering.
+
   - Optional parameters:
     - `projectKey` (string): Key of the project
     - `type` (string): Type of the folder (one of: "TEST_CASE", "TEST_CYCLE")
@@ -262,12 +283,14 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 ### Status, Priority, and Environment Tools
 
 - **`list_statuses`**: List available statuses with optional filtering.
+
   - Optional parameters:
     - `type` (string): Type of status (one of: "TEST_CASE", "TEST_CYCLE", "TEST_EXECUTION")
     - `projectKey` (string): Key of the project
     - Pagination parameters (e.g., `maxResults`, `startAt`) are supported
 
 - **`list_priorities`**: List all available priorities.
+
   - No required parameters
   - Pagination parameters (e.g., `maxResults`, `startAt`) are supported
 

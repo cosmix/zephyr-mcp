@@ -1,9 +1,6 @@
 import { ZephyrBaseService } from "./base-service";
 
-
-
 export class LinkService extends ZephyrBaseService {
-
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }
@@ -14,7 +11,6 @@ export class LinkService extends ZephyrBaseService {
    * @returns Promise resolving when the deletion is complete.
    */
   async deleteLink(linkId: number): Promise<void> {
-
     await this.request<void>("DELETE", `/links/${linkId}`);
   }
 }

@@ -1,8 +1,7 @@
 import { ZephyrBaseService } from "./base-service";
-import type { StatusList, StatusType } from "../../types"; 
+import type { StatusList, StatusType } from "../../types";
 
 export class StatusService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }

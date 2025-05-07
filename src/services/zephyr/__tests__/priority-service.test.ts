@@ -18,7 +18,10 @@ describe("PriorityService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
-    priorityService = new PriorityService(mockApiKey, "https://mock-zephyr-api.com");
+    priorityService = new PriorityService(
+      mockApiKey,
+      "https://mock-zephyr-api.com",
+    );
   });
 
   describe("listPriorities", () => {
@@ -74,7 +77,7 @@ describe("PriorityService", () => {
       await priorityService.listPriorities(params);
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.any(URL), 
+        expect.any(URL),
         expect.objectContaining({
           method: "GET",
           headers: expect.objectContaining({

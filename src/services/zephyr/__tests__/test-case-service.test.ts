@@ -8,19 +8,20 @@ import {
   type MockedFunction,
 } from "vitest";
 import type {
+  IssueLink,
+  IssueLinkInput,
   KeyedCreatedResource,
+  LinkList,
   TestCase,
   TestCaseInput,
   TestCaseList,
-  LinkList,
-  IssueLinkInput,
-  WebLinkInput,
-  Link,
   TestScript,
   TestScriptInput,
-  TestStepsList,
-  TestStepsInput,
   TestStep,
+  TestStepsInput,
+  TestStepsList,
+  WebLink,
+  WebLinkInput
 } from "../../../types";
 import { TestCaseService } from "../test-case-service";
 
@@ -33,7 +34,10 @@ describe("TestCaseService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
-    testCaseService = new TestCaseService(mockApiKey, "https://mock-zephyr-api.com");
+    testCaseService = new TestCaseService(
+      mockApiKey,
+      "https://mock-zephyr-api.com"
+    );
   });
 
   describe("getTestCase", () => {
@@ -61,7 +65,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockTestCase);
     });
@@ -77,7 +81,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCase(mockTestCaseKey),
+        testCaseService.getTestCase(mockTestCaseKey)
       ).rejects.toThrow(McpError);
     });
   });
@@ -88,13 +92,16 @@ describe("TestCaseService", () => {
         id: 1,
         key: mockTestCaseKey,
         name: "Test Case 1",
-        project: { id: "PROJ-ID" },
-        createdDate: new Date().toISOString(),
-        modifiedDate: new Date().toISOString(),
+        project: { id: 1 },
+        createdOn: new Date().toISOString(),
+        priority: { id: 1 },
+        status: { id: 1 },
       };
       const mockList: Partial<TestCaseList> = {
-        items: [mockTestCaseItem],
+        values: [mockTestCaseItem],
         total: 1,
+        offset: 0,
+        limit: 50,
       };
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
@@ -114,15 +121,14 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockList);
     });
 
     it("should fetch test cases with query parameters", async () => {
       const params = { projectKey: "PROJ", maxResults: 10, startAt: 5 };
-
-      const mockList: Partial<TestCaseList> = { items: [], total: 0 };
+      const mockList: Partial<TestCaseList> = { values: [], total: 0 };
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
         json: async () => mockList,
@@ -134,7 +140,6 @@ describe("TestCaseService", () => {
 
       await testCaseService.listTestCases(params);
 
-      
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
@@ -142,7 +147,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
     });
 
@@ -190,7 +195,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockCreated);
     });
@@ -210,7 +215,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody1),
       } as Response);
       await expect(testCaseService.createTestCase(input)).rejects.toThrow(
-        McpError,
+        McpError
       );
     });
   });
@@ -221,7 +226,6 @@ describe("TestCaseService", () => {
         name: "Updated Test Case Name",
         projectKey: "PROJ",
       };
-
       const mockUpdatedTestCase: Partial<TestCase> = {
         id: 1,
         key: mockTestCaseKey,
@@ -238,7 +242,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.updateTestCase(
         mockTestCaseKey,
-        input,
+        input
       );
       expect(result).toEqual(mockUpdatedTestCase);
 
@@ -251,7 +255,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
     });
 
@@ -270,7 +274,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody2),
       } as Response);
       await expect(
-        testCaseService.updateTestCase(mockTestCaseKey, input),
+        testCaseService.updateTestCase(mockTestCaseKey, input)
       ).rejects.toThrow(McpError);
     });
   });
@@ -280,13 +284,13 @@ describe("TestCaseService", () => {
       const mockLinks: LinkList = {
         links: [
           {
-            id: "link-1",
+            id: "1",
             type: "ISSUE",
             issueKey: "JIRA-123",
             url: "http://jira/JIRA-123",
           },
           {
-            id: "link-2",
+            id: "2",
             type: "WEB",
             url: "http://example.com",
             name: "Example",
@@ -314,7 +318,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockLinks);
     });
@@ -330,7 +334,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody3),
       } as Response);
       await expect(
-        testCaseService.getTestCaseLinks(mockTestCaseKey),
+        testCaseService.getTestCaseLinks(mockTestCaseKey)
       ).rejects.toThrow(McpError);
     });
   });
@@ -338,7 +342,11 @@ describe("TestCaseService", () => {
   describe("createTestCaseIssueLink", () => {
     it("should create an issue link successfully", async () => {
       const input: IssueLinkInput = { issueKey: "JIRA-456" };
-      const mockCreatedLink: Partial<Link> = { id: "link-3" };
+      const mockCreatedLink: Partial<IssueLink> = {
+        id: "3",
+        type: "ISSUE",
+        issueKey: "JIRA-456",
+      };
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
         json: async () => mockCreatedLink,
@@ -350,7 +358,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseIssueLink(
         mockTestCaseKey,
-        input,
+        input
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -362,7 +370,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockCreatedLink);
     });
@@ -379,7 +387,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody4),
       } as Response);
       await expect(
-        testCaseService.createTestCaseIssueLink(mockTestCaseKey, input),
+        testCaseService.createTestCaseIssueLink(mockTestCaseKey, input)
       ).rejects.toThrow(McpError);
     });
   });
@@ -390,7 +398,11 @@ describe("TestCaseService", () => {
         url: "http://new-example.com",
         name: "New Example",
       };
-      const mockCreatedLink: Partial<Link> = { id: "link-4" };
+      const mockCreatedLink: Partial<WebLink> = {
+        id: "4",
+        type: "WEB",
+        url: "http://new-example.com",
+      };
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
         json: async () => mockCreatedLink,
@@ -402,7 +414,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseWebLink(
         mockTestCaseKey,
-        input,
+        input
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -414,7 +426,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockCreatedLink);
     });
@@ -434,7 +446,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody5),
       } as Response);
       await expect(
-        testCaseService.createTestCaseWebLink(mockTestCaseKey, input),
+        testCaseService.createTestCaseWebLink(mockTestCaseKey, input)
       ).rejects.toThrow(McpError);
     });
   });
@@ -454,8 +466,9 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(mockScript),
       } as Response);
 
-      const result =
-        await testCaseService.getTestCaseTestScript(mockTestCaseKey);
+      const result = await testCaseService.getTestCaseTestScript(
+        mockTestCaseKey
+      );
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -464,7 +477,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockScript);
     });
@@ -480,7 +493,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCaseTestScript(mockTestCaseKey),
+        testCaseService.getTestCaseTestScript(mockTestCaseKey)
       ).rejects.toThrow(McpError);
     });
   });
@@ -501,7 +514,7 @@ describe("TestCaseService", () => {
       } as Response);
 
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
       ).resolves.toBeUndefined();
 
       expect(fetch).toHaveBeenCalledWith(
@@ -513,7 +526,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
     });
 
@@ -531,7 +544,7 @@ describe("TestCaseService", () => {
       } as Response);
 
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
       ).resolves.toBeUndefined();
 
       expect(fetch).toHaveBeenCalledWith(
@@ -543,7 +556,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
     });
 
@@ -559,15 +572,15 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
       ).rejects.toThrow(McpError);
     });
   });
 
   describe("getTestCaseTestSteps", () => {
-    it("should fetch test steps successfully", async () => {
+    it("should fetch test steps successfully (single page)", async () => {
       const mockSteps: TestStepsList = {
-        items: [{ id: 1, description: "Step 1", expectedResult: "Result 1" }],
+        values: [{ id: 1, description: "Step 1", expectedResult: "Result 1" }],
         total: 1,
         offset: 0,
         limit: 100,
@@ -581,8 +594,9 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(mockSteps),
       } as Response);
 
-      const result =
-        await testCaseService.getTestCaseTestSteps(mockTestCaseKey);
+      const result = await testCaseService.getTestCaseTestSteps(
+        mockTestCaseKey
+      );
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -591,9 +605,59 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        }),
+        })
       );
-      expect(result).toEqual(mockSteps);
+      expect(result.values?.length).toBe(1);
+      expect(result.values?.[0]?.description).toBe("Step 1");
+      expect(result.total).toBe(1);
+    });
+
+    it("should fetch and aggregate test steps from multiple pages", async () => {
+      const page1: any = {
+        values: Array.from({ length: 100 }, (_, i) => ({
+          id: i + 1,
+          description: `Step ${i + 1}`,
+          expectedResult: `Result ${i + 1}`,
+        })),
+        total: 150,
+        offset: 0,
+        limit: 100,
+      };
+      const page2: any = {
+        values: Array.from({ length: 50 }, (_, i) => ({
+          id: 101 + i,
+          description: `Step ${101 + i}`,
+          expectedResult: `Result ${101 + i}`,
+        })),
+        total: 150,
+        offset: 100,
+        limit: 100,
+      };
+      (fetch as MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => page1,
+          status: 200,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(page1),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => page2,
+          status: 200,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(page2),
+        } as Response);
+
+      const result = await testCaseService.getTestCaseTestSteps(
+        mockTestCaseKey
+      );
+      expect(result.values?.length).toBe(150);
+      expect(result.values?.[0]?.description).toBe("Step 1");
+      expect(result.values?.[149]?.description).toBe("Step 150");
+      expect(result.total).toBe(150);
     });
 
     it("should throw McpError on API failure", async () => {
@@ -607,7 +671,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCaseTestSteps(mockTestCaseKey),
+        testCaseService.getTestCaseTestSteps(mockTestCaseKey)
       ).rejects.toThrow(McpError);
     });
   });
@@ -635,7 +699,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseTestSteps(
         mockTestCaseKey,
-        input,
+        input
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -647,7 +711,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        }),
+        })
       );
       expect(result).toEqual(mockCreatedSteps);
     });
@@ -669,7 +733,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.createTestCaseTestSteps(mockTestCaseKey, input),
+        testCaseService.createTestCaseTestSteps(mockTestCaseKey, input)
       ).rejects.toThrow(McpError);
     });
   });

@@ -1,16 +1,10 @@
-import type {
-  Link,
-  PagedList,
-  ResourceId,
-} from "./base";
+import type { Link, PagedList, ResourceId } from "./base";
 import type { IssueLink, WebLink } from "./link";
-
 
 interface TestCaseOwner {
   self: string;
   accountId: string;
 }
-
 
 interface TestCaseLinks {
   self: string;
@@ -18,11 +12,9 @@ interface TestCaseLinks {
   webLinks?: WebLink[];
 }
 
-
 interface TestScriptLink {
   self: string;
 }
-
 
 export interface TestCase {
   id: number;
@@ -60,10 +52,9 @@ export interface TestCaseInput {
   parameters?: any;
   testScript?: TestScriptInput;
   testSteps?: TestStepsInput;
-
 }
 
-export interface TestCaseList extends PagedList<TestCase> { }
+export interface TestCaseList extends PagedList<TestCase> {}
 
 export interface TestCaseVersionLink {
   id: number;
@@ -89,23 +80,20 @@ export interface TestStep {
   description: string;
   expectedResult: string;
   testData?: string;
-
 }
 
 export interface TestStepInput {
   description: string;
   expectedResult: string;
   testData?: string;
-
 }
 
-export interface TestStepsList extends PagedList<TestStep> { }
+export interface TestStepsList extends PagedList<TestStep> {}
 
 export interface TestStepsInput {
   mode: "OVERWRITE" | "APPEND";
   testSteps: TestStepInput[];
 }
-
 
 export interface GetTestCaseArgs {
   testCaseKey: string;
@@ -115,7 +103,6 @@ export interface ListTestCasesArgs {
   projectKey?: string;
   folderId?: number;
   jiraIssueKey?: string;
-
 }
 
 export interface CreateTestCaseArgs {

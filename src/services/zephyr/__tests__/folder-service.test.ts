@@ -58,7 +58,6 @@ describe("FolderService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "GET",
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
@@ -125,7 +124,6 @@ describe("FolderService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "GET",
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
@@ -168,7 +166,6 @@ describe("FolderService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "GET",
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
@@ -230,7 +227,6 @@ describe("FolderService", () => {
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
         expect.objectContaining({
-
           method: "POST",
           body: JSON.stringify(folderInput),
           headers: expect.objectContaining({

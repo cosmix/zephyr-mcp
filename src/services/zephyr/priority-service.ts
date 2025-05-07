@@ -1,8 +1,7 @@
 import { ZephyrBaseService } from "./base-service";
-import type { PriorityList } from "../../types/zephyr/priority"; 
+import type { PriorityList } from "../../types/zephyr/priority";
 
 export class PriorityService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }

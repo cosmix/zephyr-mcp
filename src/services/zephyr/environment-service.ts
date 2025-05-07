@@ -1,8 +1,7 @@
 import { ZephyrBaseService } from "./base-service";
-import type { EnvironmentList } from "../../types/zephyr/environment"; 
+import type { EnvironmentList } from "../../types/zephyr/environment";
 
 export class EnvironmentService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }

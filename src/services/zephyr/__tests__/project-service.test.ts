@@ -18,7 +18,10 @@ describe("ProjectService", () => {
     vi.clearAllMocks();
 
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
-    projectService = new ProjectService(mockApiKey, "https://mock-zephyr-api.com");
+    projectService = new ProjectService(
+      mockApiKey,
+      "https://mock-zephyr-api.com",
+    );
   });
 
   describe("getProject", () => {

@@ -1,19 +1,17 @@
-
-
 export interface Link {
-  id: number; 
+  id: number;
   self: string;
 }
 
 export interface ResourceId {
-  id: number; 
+  id: number;
 }
 
 export interface PagedList<T> {
   total: number;
   offset: number;
   limit: number;
-  values: T[]; 
+  values: T[];
 }
 
 export interface McpError {

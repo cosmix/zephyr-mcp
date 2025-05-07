@@ -18,7 +18,10 @@ describe("StatusService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
-    statusService = new StatusService(mockApiKey, "https://mock-zephyr-api.com");
+    statusService = new StatusService(
+      mockApiKey,
+      "https://mock-zephyr-api.com",
+    );
   });
 
   describe("listStatuses", () => {

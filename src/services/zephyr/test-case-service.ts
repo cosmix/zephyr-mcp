@@ -7,12 +7,11 @@ import type {
   TestScriptInput,
   TestStep,
   TestStepsInput,
-  TestStepsList, 
+  TestStepsList,
 } from "../../types";
 import { ZephyrBaseService } from "./base-service";
 
 export class TestCaseService extends ZephyrBaseService {
-  
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }
@@ -20,7 +19,7 @@ export class TestCaseService extends ZephyrBaseService {
   async getTestCase(testCaseKey: string): Promise<TestCase> {
     const response = await this.request<TestCase>(
       "GET",
-      `/testcases/${testCaseKey}`, 
+      `/testcases/${testCaseKey}`,
     );
     return response;
   }
@@ -73,7 +72,6 @@ export class TestCaseService extends ZephyrBaseService {
     testCaseKey: string,
     issueLinkInput: any,
   ): Promise<Link> {
-    
     const response = await this.request<Link>(
       "POST",
       `testcases/${testCaseKey}/links/issues`,
@@ -86,7 +84,6 @@ export class TestCaseService extends ZephyrBaseService {
     testCaseKey: string,
     webLinkInput: any,
   ): Promise<Link> {
-    
     const response = await this.request<Link>(
       "POST",
       `testcases/${testCaseKey}/links/weblinks`,
@@ -116,14 +113,41 @@ export class TestCaseService extends ZephyrBaseService {
   }
 
   async getTestCaseTestSteps(testCaseKey: string): Promise<TestStepsList> {
-    
-    const response = await this.request<TestStepsList>( 
-      "GET",
-      `/testcases/${testCaseKey}/teststeps`,
-      { maxResults: 30 }
-    );
-    
-    return response;
+    const maxResults = 100;
+    let startAt = 0;
+    let allSteps: TestStep[] = [];
+    let isLast = false;
+    let total = 0;
+    let firstPage: TestStepsList | undefined = undefined;
+
+    while (!isLast) {
+      const response = await this.request<any>(
+        "GET",
+        `/testcases/${testCaseKey}/teststeps`,
+        undefined,
+        { maxResults, startAt },
+      );
+      if (!firstPage) firstPage = response;
+      if (response.values) {
+        allSteps = allSteps.concat(response.values);
+      } else if (response.items) {
+        allSteps = allSteps.concat(response.items);
+      }
+      total = response.total ?? allSteps.length;
+      isLast =
+        typeof response.isLast === "boolean"
+          ? response.isLast
+          : allSteps.length >= total;
+      startAt += maxResults;
+    }
+
+    // Only include properties defined in TestStepsList
+    return {
+      ...firstPage,
+      values: allSteps,
+      total: allSteps.length,
+      maxResults,
+    } as TestStepsList;
   }
 
   async createTestCaseTestSteps(

@@ -4,12 +4,11 @@ import type {
   TestExecutionList,
   TestExecutionStep,
   TestExecutionUpdate,
-  TestStepsUpdate
+  TestStepsUpdate,
 } from "../../types";
 import { ZephyrBaseService } from "./base-service";
 
 export class TestExecutionService extends ZephyrBaseService {
-
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }
@@ -17,7 +16,7 @@ export class TestExecutionService extends ZephyrBaseService {
   async getTestExecution(testExecutionIdOrKey: string): Promise<TestExecution> {
     const response = await this.request<TestExecution>(
       "GET",
-      `/testexecutions/${testExecutionIdOrKey}`, 
+      `/testexecutions/${testExecutionIdOrKey}`,
     );
     return response;
   }
@@ -30,7 +29,7 @@ export class TestExecutionService extends ZephyrBaseService {
   }): Promise<TestExecutionList> {
     const response = await this.request<TestExecutionList>(
       "GET",
-      "/testexecutions", 
+      "/testexecutions",
       undefined,
       params,
     );
@@ -42,7 +41,7 @@ export class TestExecutionService extends ZephyrBaseService {
   ): Promise<TestExecution> {
     const response = await this.request<TestExecution>(
       "POST",
-      "/testexecutions", 
+      "/testexecutions",
       testExecutionInput,
     );
     return response;
@@ -54,7 +53,7 @@ export class TestExecutionService extends ZephyrBaseService {
   ): Promise<TestExecution> {
     const response = await this.request<TestExecution>(
       "PUT",
-      `/testexecutions/${testExecutionIdOrKey}`, 
+      `/testexecutions/${testExecutionIdOrKey}`,
       testExecutionUpdate,
     );
     return response;
@@ -65,7 +64,7 @@ export class TestExecutionService extends ZephyrBaseService {
   ): Promise<TestExecutionStep[]> {
     const response = await this.request<TestExecutionStep[]>(
       "GET",
-      `/testexecutions/${testExecutionIdOrKey}/teststeps`, 
+      `/testexecutions/${testExecutionIdOrKey}/teststeps`,
     );
     return response;
   }
@@ -76,7 +75,7 @@ export class TestExecutionService extends ZephyrBaseService {
   ): Promise<TestExecutionStep[]> {
     const response = await this.request<TestExecutionStep[]>(
       "PUT",
-      `/testexecutions/${testExecutionIdOrKey}/teststeps`, 
+      `/testexecutions/${testExecutionIdOrKey}/teststeps`,
       testStepsUpdate,
     );
     return response;

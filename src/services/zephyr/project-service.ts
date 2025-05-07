@@ -2,7 +2,6 @@ import type { Project, ProjectList } from "../../types/zephyr/project";
 import { ZephyrBaseService } from "./base-service";
 
 export class ProjectService extends ZephyrBaseService {
-
   constructor(apiKey: string, baseUrl: string) {
     super(apiKey, baseUrl);
   }
