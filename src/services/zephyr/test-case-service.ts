@@ -120,6 +120,7 @@ export class TestCaseService extends ZephyrBaseService {
     const response = await this.request<TestStepsList>( 
       "GET",
       `/testcases/${testCaseKey}/teststeps`,
+      { maxResults: 30 }
     );
     
     return response;
