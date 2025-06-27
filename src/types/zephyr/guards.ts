@@ -10,6 +10,7 @@ import type {
   CreateTestCaseTestScriptArgs,
   GetTestCaseTestStepsArgs,
   CreateTestCaseTestStepsArgs,
+  UpdateTestCaseTestStepsArgs,
 } from "./test-case";
 import type {
   GetTestCycleArgs,
@@ -174,6 +175,15 @@ export function isGetTestCaseTestStepsArgs(
 export function isCreateTestCaseTestStepsArgs(
   args: any,
 ): args is CreateTestCaseTestStepsArgs {
+  return hasRequiredProperties(args, {
+    testCaseKey: isString,
+    steps: isArray, // Assuming steps is an array based on API spec
+  });
+}
+
+export function isUpdateTestCaseTestStepsArgs(
+  args: any,
+): args is UpdateTestCaseTestStepsArgs {
   return hasRequiredProperties(args, {
     testCaseKey: isString,
     steps: isArray, // Assuming steps is an array based on API spec

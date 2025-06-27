@@ -551,7 +551,16 @@ describe("TestCaseService", () => {
     it("should fetch the test script successfully", async () => {
       const mockScript: TestScript = {
         type: "STEP_BY_STEP",
-        steps: [{ id: 1, description: "Step 1", expectedResult: "Result 1" }],
+        steps: [{
+          inline: {
+            description: "Step 1",
+            testData: null,
+            expectedResult: "Result 1",
+            customFields: {},
+            reflectRef: null,
+          },
+          testCase: null,
+        }],
       };
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
@@ -675,7 +684,16 @@ describe("TestCaseService", () => {
   describe("getTestCaseTestSteps", () => {
     it("should fetch test steps successfully (single page)", async () => {
       const mockSteps: TestStepsList = {
-        values: [{ id: 1, description: "Step 1", expectedResult: "Result 1" }],
+        values: [{
+          inline: {
+            description: "Step 1",
+            testData: null,
+            expectedResult: "Result 1",
+            customFields: {},
+            reflectRef: null,
+          },
+          testCase: null,
+        }],
         total: 1,
         offset: 0,
         limit: 100,
@@ -702,16 +720,21 @@ describe("TestCaseService", () => {
         }),
       );
       expect(result.values?.length).toBe(1);
-      expect(result.values?.[0]?.description).toBe("Step 1");
+      expect(result.values?.[0]?.inline.description).toBe("Step 1");
       expect(result.total).toBe(1);
     });
 
     it("should fetch and aggregate test steps from multiple pages", async () => {
       const page1: any = {
         values: Array.from({ length: 100 }, (_, i) => ({
-          id: i + 1,
-          description: `Step ${i + 1}`,
-          expectedResult: `Result ${i + 1}`,
+          inline: {
+            description: `Step ${i + 1}`,
+            testData: null,
+            expectedResult: `Result ${i + 1}`,
+            customFields: {},
+            reflectRef: null,
+          },
+          testCase: null,
         })),
         total: 150,
         offset: 0,
@@ -719,9 +742,14 @@ describe("TestCaseService", () => {
       };
       const page2: any = {
         values: Array.from({ length: 50 }, (_, i) => ({
-          id: 101 + i,
-          description: `Step ${101 + i}`,
-          expectedResult: `Result ${101 + i}`,
+          inline: {
+            description: `Step ${101 + i}`,
+            testData: null,
+            expectedResult: `Result ${101 + i}`,
+            customFields: {},
+            reflectRef: null,
+          },
+          testCase: null,
         })),
         total: 150,
         offset: 100,
@@ -748,8 +776,8 @@ describe("TestCaseService", () => {
       const result =
         await testCaseService.getTestCaseTestSteps(mockTestCaseKey);
       expect(result.values?.length).toBe(150);
-      expect(result.values?.[0]?.description).toBe("Step 1");
-      expect(result.values?.[149]?.description).toBe("Step 150");
+      expect(result.values?.[0]?.inline.description).toBe("Step 1");
+      expect(result.values?.[149]?.inline.description).toBe("Step 150");
       expect(result.total).toBe(150);
     });
 
@@ -778,8 +806,34 @@ describe("TestCaseService", () => {
         ],
       };
 
+      // Expected transformed payload that should be sent to API
+      const expectedTransformedPayload = {
+        mode: "OVERWRITE",
+        items: [
+          {
+            inline: {
+              description: "New Step 1",
+              testData: null,
+              expectedResult: "New Result 1",
+              customFields: {},
+              reflectRef: null,
+            },
+            testCase: null,
+          },
+        ],
+      };
+
       const mockCreatedSteps: TestStep[] = [
-        { id: 2, description: "New Step 1", expectedResult: "New Result 1" },
+        {
+          inline: {
+            description: "New Step 1",
+            testData: null,
+            expectedResult: "New Result 1",
+            customFields: {},
+            reflectRef: null,
+          },
+          testCase: null,
+        },
       ];
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
         ok: true,
@@ -799,7 +853,7 @@ describe("TestCaseService", () => {
         expect.any(URL),
         expect.objectContaining({
           method: "POST",
-          body: JSON.stringify(input),
+          body: JSON.stringify(expectedTransformedPayload),
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",

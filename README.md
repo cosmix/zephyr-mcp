@@ -8,29 +8,33 @@ This project implements a Model Context Protocol (MCP) server for interacting wi
 
 ## Setup
 
-1.  **Clone the repository (if applicable):**
+1. **Clone the repository (if applicable):**
 
     ```bash
     git clone <repository-url>
     cd zephyr-mcp
     ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
 
     ```bash
     bun install
     ```
 
-3.  **Configure Environment Variables:**
+3. **Configure Environment Variables:**
     - Copy the example environment file:
+
       ```bash
       cp .env.example .env
       ```
+
     - Edit the `.env` file and add your Zephyr Scale API Key and Base URL:
+
       ```
       ZEPHYR_API_KEY=YOUR_ZEPHYR_SCALE_API_KEY
       ZEPHYR_BASE_URL=YOUR_ZEPHYR_SCALE_BASE_URL # e.g., https://api.zephyrscale.smartbear.com/v2
       ```
+
     - **Generating a Zephyr Scale API Key:**
       - Log in to your Jira instance.
       - Navigate to your user menu (top right corner) and select "Zephyr Scale API Access Tokens".
@@ -135,7 +139,29 @@ This server provides a comprehensive set of tools to interact with Zephyr Scale.
 - **`create_test_case_test_steps`**: Create or update test steps for a test case.
   - Required parameters:
     - `testCaseKey` (string): The key of the test case
-    - `steps` (array): Array of test step objects
+    - `steps` (array): Array of test step objects with the following structure:
+
+      ```json
+      [
+        {
+          "description": "Step description (e.g., 'Login to application')",
+          "expectedResult": "Expected outcome (e.g., 'User should be logged in successfully')",
+          "testData": "Optional test data (e.g., 'username: admin, password: admin123')"
+        }
+      ]
+      ```
+
+  - Optional parameters:
+    - `mode` (string): Mode for creating test steps - "OVERWRITE" (default) or "APPEND"
+
+- **`update_test_case_test_steps`**: Update test steps for a test case with specified mode.
+  - Required parameters:
+    - `testCaseKey` (string): The key of the test case
+    - `steps` (array): Array of test step objects (same structure as create_test_case_test_steps)
+  - Optional parameters:
+    - `mode` (string): Mode for updating test steps - "OVERWRITE" (default) or "APPEND"
+      - "OVERWRITE": Replaces all existing test steps with the new ones
+      - "APPEND": Adds the new test steps to the end of the existing list
 
 ### Test Cycle Tools
 
@@ -340,6 +366,42 @@ Here are a few examples of how to use these tools:
     "testCaseKey": "YOUR-PROJECT-KEY-T123",
     "testCycleKey": "YOUR-PROJECT-KEY-R1",
     "statusId": 1
+  }
+}
+
+// Create test steps for a test case
+{
+  "tool_name": "create_test_case_test_steps",
+  "arguments": {
+    "testCaseKey": "YOUR-PROJECT-KEY-T123",
+    "steps": [
+      {
+        "description": "Navigate to login page",
+        "expectedResult": "Login page should be displayed",
+        "testData": "URL: https://app.example.com/login"
+      },
+      {
+        "description": "Enter valid credentials",
+        "expectedResult": "User should be logged in successfully",
+        "testData": "username: testuser, password: testpass123"
+      }
+    ],
+    "mode": "OVERWRITE"
+  }
+}
+
+// Update test steps (append new steps)
+{
+  "tool_name": "update_test_case_test_steps",
+  "arguments": {
+    "testCaseKey": "YOUR-PROJECT-KEY-T123",
+    "steps": [
+      {
+        "description": "Verify dashboard widgets",
+        "expectedResult": "All dashboard widgets should be displayed correctly"
+      }
+    ],
+    "mode": "APPEND"
   }
 }
 ```

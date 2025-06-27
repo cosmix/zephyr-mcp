@@ -63,6 +63,7 @@ import {
   isListTestCyclesArgs,
   isListTestExecutionsArgs,
   isUpdateTestCaseArgs,
+  isUpdateTestCaseTestStepsArgs,
   isUpdateTestCycleArgs,
   isUpdateTestExecutionArgs,
   isUpdateTestExecutionTestStepsArgs,
@@ -293,6 +294,20 @@ class ZephyrServer {
             properties: {
               testCaseKey: { type: "string" },
               steps: { type: "array", items: { type: "object" } },
+              mode: { type: "string", enum: ["OVERWRITE", "APPEND"], description: "Mode for creating test steps (default: OVERWRITE)" },
+            },
+            required: ["testCaseKey", "steps"],
+          },
+        },
+        {
+          name: "update_test_case_test_steps",
+          description: "Update test steps for a test case with specified mode.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              testCaseKey: { type: "string" },
+              steps: { type: "array", items: { type: "object" } },
+              mode: { type: "string", enum: ["OVERWRITE", "APPEND"], description: "Mode for updating test steps (default: OVERWRITE)" },
             },
             required: ["testCaseKey", "steps"],
           },
@@ -795,7 +810,7 @@ class ZephyrServer {
                 args,
               );
             const testStepsInput: TestStepsInput = {
-              mode: "OVERWRITE",
+              mode: args.mode || "OVERWRITE",
               testSteps: args.steps as TestStepInput[],
             };
             const createdOrUpdatedSteps =
@@ -808,6 +823,31 @@ class ZephyrServer {
                 {
                   type: "text",
                   text: JSON.stringify(createdOrUpdatedSteps, null, 2),
+                },
+              ],
+            };
+            break;
+          case "update_test_case_test_steps":
+            if (!isUpdateTestCaseTestStepsArgs(args))
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                "Invalid arguments for update_test_case_test_steps",
+                args,
+              );
+            const updateTestStepsInput: TestStepsInput = {
+              mode: args.mode || "OVERWRITE",
+              testSteps: args.steps as TestStepInput[],
+            };
+            const updatedSteps =
+              await this.testCaseService.createTestCaseTestSteps(
+                args.testCaseKey,
+                updateTestStepsInput,
+              );
+            result = {
+              content: [
+                {
+                  type: "text",
+                  text: JSON.stringify(updatedSteps, null, 2),
                 },
               ],
             };

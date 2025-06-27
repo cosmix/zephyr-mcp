@@ -224,10 +224,25 @@ export class TestCaseService extends ZephyrBaseService {
     testCaseKey: string,
     testStepsInput: TestStepsInput,
   ): Promise<TestStep[]> {
+    // Transform simple input format to complex API format
+    const transformedPayload = {
+      mode: testStepsInput.mode,
+      items: testStepsInput.testSteps.map(step => ({
+        inline: {
+          description: step.description,
+          testData: step.testData || null,
+          expectedResult: step.expectedResult,
+          customFields: {},
+          reflectRef: null,
+        },
+        testCase: null,
+      })),
+    };
+
     const response = await this.request<TestStep[]>(
       "POST",
       `testcases/${testCaseKey}/teststeps`,
-      testStepsInput,
+      transformedPayload,
     );
     return response;
   }

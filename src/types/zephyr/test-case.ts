@@ -94,16 +94,20 @@ export interface TestScriptInput {
 }
 
 export interface TestStep {
-  id: number;
-  description: string;
-  expectedResult: string;
-  testData?: string;
+  inline: {
+    description: string;
+    testData: string | null;
+    expectedResult: string;
+    customFields: Record<string, any>;
+    reflectRef: string | null;
+  };
+  testCase: any | null;
 }
 
 export interface TestStepInput {
   description: string;
   expectedResult: string;
-  testData?: string;
+  testData?: string | null;
 }
 
 export interface TestStepsList extends PagedList<TestStep> {}
@@ -184,4 +188,33 @@ export interface GetTestCaseTestStepsArgs {
 export interface CreateTestCaseTestStepsArgs {
   testCaseKey: string;
   steps: TestStepInput[];
+  mode?: "OVERWRITE" | "APPEND";
+}
+
+export interface UpdateTestCaseTestStepsArgs {
+  testCaseKey: string;
+  steps: TestStepInput[];
+  mode?: "OVERWRITE" | "APPEND";
+}
+
+// Transformation utilities
+export function transformTestStepInputToAPI(input: TestStepInput): any {
+  return {
+    inline: {
+      description: input.description,
+      testData: input.testData || null,
+      expectedResult: input.expectedResult,
+      customFields: {},
+      reflectRef: null,
+    },
+    testCase: null,
+  };
+}
+
+export function transformTestStepFromAPI(apiStep: TestStep): TestStepInput {
+  return {
+    description: apiStep.inline.description,
+    testData: apiStep.inline.testData,
+    expectedResult: apiStep.inline.expectedResult,
+  };
 }
