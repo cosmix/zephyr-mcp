@@ -15,13 +15,14 @@ import type {
   TestCase,
   TestCaseInput,
   TestCaseList,
+  TestCaseUpdateInput,
   TestScript,
   TestScriptInput,
   TestStep,
   TestStepsInput,
   TestStepsList,
   WebLink,
-  WebLinkInput
+  WebLinkInput,
 } from "../../../types";
 import { TestCaseService } from "../test-case-service";
 
@@ -36,7 +37,7 @@ describe("TestCaseService", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(vi.fn());
     testCaseService = new TestCaseService(
       mockApiKey,
-      "https://mock-zephyr-api.com"
+      "https://mock-zephyr-api.com",
     );
   });
 
@@ -65,7 +66,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockTestCase);
     });
@@ -81,7 +82,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCase(mockTestCaseKey)
+        testCaseService.getTestCase(mockTestCaseKey),
       ).rejects.toThrow(McpError);
     });
   });
@@ -121,7 +122,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockList);
     });
@@ -147,7 +148,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
     });
 
@@ -195,7 +196,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockCreated);
     });
@@ -215,54 +216,149 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody1),
       } as Response);
       await expect(testCaseService.createTestCase(input)).rejects.toThrow(
-        McpError
+        McpError,
       );
     });
   });
 
   describe("updateTestCase", () => {
-    it("should update a test case successfully", async () => {
-      const input: TestCaseInput = {
+    it("should update a test case with only name change successfully", async () => {
+      const input: TestCaseUpdateInput = {
         name: "Updated Test Case Name",
-        projectKey: "PROJ",
       };
-      const mockUpdatedTestCase: Partial<TestCase> = {
+      const mockCurrentTestCase: Partial<TestCase> = {
         id: 1,
         key: mockTestCaseKey,
+        name: "Original Test Case Name",
+        project: { id: 1 },
+        createdOn: new Date().toISOString(),
+        priority: { id: 1 },
+        status: { id: 1 },
+      };
+      const mockUpdatedTestCase: Partial<TestCase> = {
+        ...mockCurrentTestCase,
         name: input.name,
       };
-      (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => mockUpdatedTestCase,
-        statusText: "OK",
-        headers: new Headers({ "content-type": "application/json" }),
-        text: async () => JSON.stringify(mockUpdatedTestCase),
-      } as Response);
+      
+      // Mock the first call to get current test case
+      (fetch as MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => mockCurrentTestCase,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(mockCurrentTestCase),
+        } as Response)
+        // Mock the second call to update the test case
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => mockUpdatedTestCase,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(mockUpdatedTestCase),
+        } as Response);
 
       const result = await testCaseService.updateTestCase(
         mockTestCaseKey,
-        input
+        input,
       );
       expect(result).toEqual(mockUpdatedTestCase);
 
-      expect(fetch).toHaveBeenCalledWith(
+      // Should make two calls: first GET, then PUT
+      expect(fetch).toHaveBeenCalledTimes(2);
+      
+      // Check the PUT call
+      expect(fetch).toHaveBeenNthCalledWith(2,
         expect.any(URL),
         expect.objectContaining({
           method: "PUT",
-          body: JSON.stringify(input),
+          body: expect.stringContaining('"Updated Test Case Name"'),
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
     });
 
-    it("should throw McpError on API failure", async () => {
-      const input: TestCaseInput = {
+    it("should update a test case with multiple fields successfully", async () => {
+      const input: TestCaseUpdateInput = {
         name: "Updated Test Case Name",
-        projectKey: "PROJ",
+        folderId: 123,
+        priorityId: 4,
+      };
+      const mockCurrentTestCase: Partial<TestCase> = {
+        id: 1,
+        key: mockTestCaseKey,
+        name: "Original Test Case Name",
+        project: { id: 1 },
+        createdOn: new Date().toISOString(),
+        priority: { id: 1 },
+        status: { id: 1 },
+        folder: { id: 1 },
+      };
+      const mockUpdatedTestCase: Partial<TestCase> = {
+        ...mockCurrentTestCase,
+        name: input.name,
+        folder: { id: input.folderId! },
+        priority: { id: input.priorityId! },
+      };
+      
+      // Mock the first call to get current test case
+      (fetch as MockedFunction<typeof fetch>)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => mockCurrentTestCase,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(mockCurrentTestCase),
+        } as Response)
+        // Mock the second call to update the test case
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => mockUpdatedTestCase,
+          statusText: "OK",
+          headers: new Headers({ "content-type": "application/json" }),
+          text: async () => JSON.stringify(mockUpdatedTestCase),
+        } as Response);
+
+      const result = await testCaseService.updateTestCase(
+        mockTestCaseKey,
+        input,
+      );
+      expect(result).toEqual(mockUpdatedTestCase);
+
+      // Should make two calls: first GET, then PUT
+      expect(fetch).toHaveBeenCalledTimes(2);
+      
+      // Check the PUT call contains the merged data
+      expect(fetch).toHaveBeenNthCalledWith(2,
+        expect.any(URL),
+        expect.objectContaining({
+          method: "PUT",
+          body: expect.stringContaining('"Updated Test Case Name"'),
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${mockApiKey}`,
+            "Content-Type": "application/json",
+          }),
+        }),
+      );
+    });
+
+    it("should throw an error if no fields are provided for update", async () => {
+      const input: TestCaseUpdateInput = {};
+      await expect(
+        testCaseService.updateTestCase(mockTestCaseKey, input),
+      ).rejects.toThrow("No fields provided for update.");
+    });
+
+    it("should throw McpError on API failure", async () => {
+      const input: TestCaseUpdateInput = {
+        name: "Updated Test Case Name",
       };
       const errorBody2 = {};
       (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
@@ -274,7 +370,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody2),
       } as Response);
       await expect(
-        testCaseService.updateTestCase(mockTestCaseKey, input)
+        testCaseService.updateTestCase(mockTestCaseKey, input),
       ).rejects.toThrow(McpError);
     });
   });
@@ -318,7 +414,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockLinks);
     });
@@ -334,7 +430,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody3),
       } as Response);
       await expect(
-        testCaseService.getTestCaseLinks(mockTestCaseKey)
+        testCaseService.getTestCaseLinks(mockTestCaseKey),
       ).rejects.toThrow(McpError);
     });
   });
@@ -358,7 +454,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseIssueLink(
         mockTestCaseKey,
-        input
+        input,
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -370,7 +466,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockCreatedLink);
     });
@@ -387,7 +483,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody4),
       } as Response);
       await expect(
-        testCaseService.createTestCaseIssueLink(mockTestCaseKey, input)
+        testCaseService.createTestCaseIssueLink(mockTestCaseKey, input),
       ).rejects.toThrow(McpError);
     });
   });
@@ -414,7 +510,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseWebLink(
         mockTestCaseKey,
-        input
+        input,
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -426,7 +522,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockCreatedLink);
     });
@@ -446,7 +542,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody5),
       } as Response);
       await expect(
-        testCaseService.createTestCaseWebLink(mockTestCaseKey, input)
+        testCaseService.createTestCaseWebLink(mockTestCaseKey, input),
       ).rejects.toThrow(McpError);
     });
   });
@@ -466,9 +562,8 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(mockScript),
       } as Response);
 
-      const result = await testCaseService.getTestCaseTestScript(
-        mockTestCaseKey
-      );
+      const result =
+        await testCaseService.getTestCaseTestScript(mockTestCaseKey);
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -477,7 +572,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockScript);
     });
@@ -493,7 +588,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCaseTestScript(mockTestCaseKey)
+        testCaseService.getTestCaseTestScript(mockTestCaseKey),
       ).rejects.toThrow(McpError);
     });
   });
@@ -514,8 +609,8 @@ describe("TestCaseService", () => {
       } as Response);
 
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
-      ).resolves.toBeUndefined();
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
+      ).resolves.toEqual({});
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -526,7 +621,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
     });
 
@@ -544,8 +639,8 @@ describe("TestCaseService", () => {
       } as Response);
 
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
-      ).resolves.toBeUndefined();
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
+      ).resolves.toEqual({});
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -556,7 +651,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
     });
 
@@ -572,7 +667,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.createTestCaseTestScript(mockTestCaseKey, input)
+        testCaseService.createTestCaseTestScript(mockTestCaseKey, input),
       ).rejects.toThrow(McpError);
     });
   });
@@ -594,9 +689,8 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(mockSteps),
       } as Response);
 
-      const result = await testCaseService.getTestCaseTestSteps(
-        mockTestCaseKey
-      );
+      const result =
+        await testCaseService.getTestCaseTestSteps(mockTestCaseKey);
 
       expect(fetch).toHaveBeenCalledWith(
         expect.any(URL),
@@ -605,7 +699,7 @@ describe("TestCaseService", () => {
           headers: expect.objectContaining({
             Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
       expect(result.values?.length).toBe(1);
       expect(result.values?.[0]?.description).toBe("Step 1");
@@ -651,9 +745,8 @@ describe("TestCaseService", () => {
           text: async () => JSON.stringify(page2),
         } as Response);
 
-      const result = await testCaseService.getTestCaseTestSteps(
-        mockTestCaseKey
-      );
+      const result =
+        await testCaseService.getTestCaseTestSteps(mockTestCaseKey);
       expect(result.values?.length).toBe(150);
       expect(result.values?.[0]?.description).toBe("Step 1");
       expect(result.values?.[149]?.description).toBe("Step 150");
@@ -671,7 +764,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.getTestCaseTestSteps(mockTestCaseKey)
+        testCaseService.getTestCaseTestSteps(mockTestCaseKey),
       ).rejects.toThrow(McpError);
     });
   });
@@ -699,7 +792,7 @@ describe("TestCaseService", () => {
 
       const result = await testCaseService.createTestCaseTestSteps(
         mockTestCaseKey,
-        input
+        input,
       );
 
       expect(fetch).toHaveBeenCalledWith(
@@ -711,7 +804,7 @@ describe("TestCaseService", () => {
             Authorization: `Bearer ${mockApiKey}`,
             "Content-Type": "application/json",
           }),
-        })
+        }),
       );
       expect(result).toEqual(mockCreatedSteps);
     });
@@ -733,7 +826,7 @@ describe("TestCaseService", () => {
         text: async () => JSON.stringify(errorBody),
       } as Response);
       await expect(
-        testCaseService.createTestCaseTestSteps(mockTestCaseKey, input)
+        testCaseService.createTestCaseTestSteps(mockTestCaseKey, input),
       ).rejects.toThrow(McpError);
     });
   });

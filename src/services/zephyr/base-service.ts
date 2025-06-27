@@ -84,7 +84,9 @@ export abstract class ZephyrBaseService {
         return (await response.json()) as T;
       }
 
-      return undefined as T;
+      // For successful responses with no content (like PUT operations), 
+      // return an empty object instead of undefined
+      return {} as T;
     } catch (error) {
       if (error instanceof McpError) {
         console.error(

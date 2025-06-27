@@ -23,6 +23,7 @@ import type { FolderInput } from "./types/zephyr/folder";
 import type { WebLinkInput } from "./types/zephyr/link";
 import type {
   TestCaseInput,
+  TestCaseUpdateInput,
   TestScriptInput,
   TestStepInput,
   TestStepsInput,
@@ -577,7 +578,7 @@ class ZephyrServer {
             const combinedResult = { ...singleTestCase };
             delete combinedResult.testScript;
 
-            combinedResult.testSteps = testSteps;
+            combinedResult.testSteps = testSteps.values;
 
             result = {
               content: [
@@ -625,19 +626,54 @@ class ZephyrServer {
                 "Invalid arguments for update_test_case",
                 args,
               );
-            const { testCaseKey: tcUpdateKey, ...tcUpdateData } = args;
-            const updatedTestCase = await this.testCaseService.updateTestCase(
-              tcUpdateKey,
-              tcUpdateData as any,
-            );
-            result = {
-              content: [
-                {
-                  type: "text",
-                  text: JSON.stringify(updatedTestCase, null, 2),
-                },
-              ],
-            };
+            try {
+              const { testCaseKey: tcUpdateKey, ...tcUpdateData } = args;
+
+              // Ensure we have a properly typed update payload
+              const updatePayload: TestCaseUpdateInput = tcUpdateData;
+
+              const updatedTestCase = await this.testCaseService.updateTestCase(
+                tcUpdateKey,
+                updatePayload,
+              );
+              
+              // Ensure we always have valid content for MCP response
+              if (!updatedTestCase) {
+                result = {
+                  content: [
+                    {
+                      type: "text",
+                      text: JSON.stringify({
+                        success: false,
+                        error: "Failed to update test case - no response received"
+                      }, null, 2),
+                    },
+                  ],
+                };
+              } else {
+                result = {
+                  content: [
+                    {
+                      type: "text",
+                      text: JSON.stringify(updatedTestCase, null, 2),
+                    },
+                  ],
+                };
+              }
+            } catch (error) {
+              // Handle any errors and provide valid MCP response
+              result = {
+                content: [
+                  {
+                    type: "text",
+                    text: JSON.stringify({
+                      success: false,
+                      error: error instanceof Error ? error.message : "Unknown error occurred while updating test case"
+                    }, null, 2),
+                  },
+                ],
+              };
+            }
             break;
           case "get_test_case_links":
             if (!isGetTestCaseLinksArgs(args))

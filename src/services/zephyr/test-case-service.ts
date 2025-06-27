@@ -3,6 +3,7 @@ import type {
   TestCase,
   TestCaseInput,
   TestCaseList,
+  TestCaseUpdateInput,
   TestScript,
   TestScriptInput,
   TestStep,
@@ -50,14 +51,83 @@ export class TestCaseService extends ZephyrBaseService {
 
   async updateTestCase(
     testCaseKey: string,
-    testCaseInput: TestCaseInput,
+    testCaseInput: TestCaseUpdateInput,
   ): Promise<TestCase> {
-    const response = await this.request<TestCase>(
-      "PUT",
-      `testcases/${testCaseKey}`,
-      testCaseInput,
-    );
-    return response;
+    try {
+      if (Object.keys(testCaseInput).length === 0) {
+        throw new Error("No fields provided for update.");
+      }
+
+      // First, get the current test case to merge with updates
+      const currentTestCase = await this.getTestCase(testCaseKey);
+
+      // Create the complete test case object by merging current data with updates
+      // The Zephyr API requires a complete TestCase object for updates
+      const updatePayload: any = {
+        ...currentTestCase,
+        // Apply updates, preserving structure expected by API
+        name: testCaseInput.name ?? currentTestCase.name,
+      };
+
+      // Update specific fields if provided
+      if (testCaseInput.folderId !== undefined) {
+        updatePayload.folder = testCaseInput.folderId ? { id: testCaseInput.folderId } : null;
+      }
+      if (testCaseInput.statusId !== undefined) {
+        updatePayload.status = { id: testCaseInput.statusId };
+      }
+      if (testCaseInput.priorityId !== undefined) {
+        updatePayload.priority = { id: testCaseInput.priorityId };
+      }
+      if (testCaseInput.ownerId !== undefined) {
+        updatePayload.owner = testCaseInput.ownerId ? { accountId: testCaseInput.ownerId } : null;
+      }
+
+      // Handle nested parameters if provided
+      if (testCaseInput.parameters) {
+        if (testCaseInput.parameters.objective !== undefined) {
+          updatePayload.objective = testCaseInput.parameters.objective;
+        }
+        if (testCaseInput.parameters.precondition !== undefined) {
+          updatePayload.precondition = testCaseInput.parameters.precondition;
+        }
+        if (testCaseInput.parameters.estimatedTime !== undefined) {
+          updatePayload.estimatedTime = testCaseInput.parameters.estimatedTime;
+        }
+        if (testCaseInput.parameters.labels !== undefined) {
+          updatePayload.labels = testCaseInput.parameters.labels;
+        }
+        if (testCaseInput.parameters.customFields !== undefined) {
+          updatePayload.customFields = testCaseInput.parameters.customFields;
+        }
+      }
+
+      const response = await this.request<TestCase>(
+        "PUT",
+        `testcases/${testCaseKey}`,
+        updatePayload,
+      );
+      
+      // If the API returns an empty object (no content), fetch the updated test case
+      if (!response || Object.keys(response).length === 0) {
+        const updatedTestCase = await this.getTestCase(testCaseKey);
+        if (!updatedTestCase) {
+          throw new Error(`Failed to retrieve updated test case ${testCaseKey}`);
+        }
+        return updatedTestCase;
+      }
+      
+      return response;
+    } catch (error) {
+      // Re-throw McpErrors directly, but add context to other errors
+      if (error instanceof Error && error.constructor.name === 'McpError') {
+        throw error;
+      }
+      // Re-throw with more context for other errors
+      throw new Error(
+        `Failed to update test case ${testCaseKey}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   async getTestCaseLinks(testCaseKey: string): Promise<Link[]> {

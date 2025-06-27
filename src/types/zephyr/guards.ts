@@ -110,9 +110,13 @@ export function isCreateTestCaseArgs(args: any): args is CreateTestCaseArgs {
 }
 
 export function isUpdateTestCaseArgs(args: any): args is UpdateTestCaseArgs {
-  return hasRequiredProperties(args, {
-    testCaseKey: isString,
-  });
+  if (!hasRequiredProperties(args, { testCaseKey: isString })) {
+    return false;
+  }
+
+  // Ensure at least one field is being updated (excluding testCaseKey)
+  const { testCaseKey, ...updateFields } = args;
+  return Object.keys(updateFields).length > 0;
 }
 
 export function isGetTestCaseLinksArgs(

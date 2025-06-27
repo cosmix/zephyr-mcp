@@ -54,6 +54,24 @@ export interface TestCaseInput {
   testSteps?: TestStepsInput;
 }
 
+/**
+ * Represents the input for updating an existing Test Case.
+ * All fields are optional, allowing for partial updates.
+ */
+export interface TestCaseUpdateInput {
+  name?: string;
+  folderId?: number;
+  statusId?: number;
+  priorityId?: number;
+  ownerId?: number;
+  jiraIssueKey?: string;
+  links?: Link[];
+  parameters?: any; // Consider a more specific type if parameters structure is known
+  testScript?: TestScriptInput;
+  testSteps?: TestStepsInput;
+}
+
+
 export interface TestCaseList extends PagedList<TestCase> {}
 
 export interface TestCaseVersionLink {

@@ -50,9 +50,12 @@ describe("Type Guards", () => {
 
   describe("isUpdateTestCaseArgs", () => {
     it("should return true for valid args", () => {
-      expect(guards.isUpdateTestCaseArgs({ testCaseKey: "PROJ-T1" })).toBe(
-        true,
-      );
+      expect(
+        guards.isUpdateTestCaseArgs({
+          testCaseKey: "PROJ-T1",
+          name: "Updated Test",
+        }),
+      ).toBe(true);
     });
     it("should return true for valid args with optional props", () => {
       expect(
@@ -61,6 +64,11 @@ describe("Type Guards", () => {
     });
     it("should return false for missing required property", () => {
       expect(guards.isUpdateTestCaseArgs({ name: "New" })).toBe(false);
+    });
+    it("should return false for only testCaseKey without update fields", () => {
+      expect(guards.isUpdateTestCaseArgs({ testCaseKey: "PROJ-T1" })).toBe(
+        false,
+      );
     });
     it("should return false for wrong type", () => {
       expect(guards.isUpdateTestCaseArgs({ testCaseKey: 123 })).toBe(false);
