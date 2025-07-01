@@ -288,12 +288,25 @@ class ZephyrServer {
         },
         {
           name: "create_test_case_test_steps",
-          description: "Create or update test steps for a test case.",
+          description: "Create or update test steps for a test case. Each step should be a simple object with description, testData, and expectedResult properties (NOT wrapped in an 'inline' object).",
           inputSchema: {
             type: "object",
             properties: {
               testCaseKey: { type: "string" },
-              steps: { type: "array", items: { type: "object" } },
+              steps: { 
+                type: "array", 
+                items: { 
+                  type: "object",
+                  properties: {
+                    description: { type: "string", description: "Step description" },
+                    testData: { type: "string", description: "Test data for the step (optional)" },
+                    expectedResult: { type: "string", description: "Expected result of the step" }
+                  },
+                  required: ["description", "expectedResult"],
+                  additionalProperties: false
+                },
+                description: "Array of test step objects in simple format: {description, testData?, expectedResult}"
+              },
               mode: { type: "string", enum: ["OVERWRITE", "APPEND"], description: "Mode for creating test steps (default: OVERWRITE)" },
             },
             required: ["testCaseKey", "steps"],
@@ -301,12 +314,25 @@ class ZephyrServer {
         },
         {
           name: "update_test_case_test_steps",
-          description: "Update test steps for a test case with specified mode.",
+          description: "Update test steps for a test case with specified mode. Each step should be a simple object with description, testData, and expectedResult properties (NOT wrapped in an 'inline' object).",
           inputSchema: {
             type: "object",
             properties: {
               testCaseKey: { type: "string" },
-              steps: { type: "array", items: { type: "object" } },
+              steps: { 
+                type: "array", 
+                items: { 
+                  type: "object",
+                  properties: {
+                    description: { type: "string", description: "Step description" },
+                    testData: { type: "string", description: "Test data for the step (optional)" },
+                    expectedResult: { type: "string", description: "Expected result of the step" }
+                  },
+                  required: ["description", "expectedResult"],
+                  additionalProperties: false
+                },
+                description: "Array of test step objects in simple format: {description, testData?, expectedResult}"
+              },
               mode: { type: "string", enum: ["OVERWRITE", "APPEND"], description: "Mode for updating test steps (default: OVERWRITE)" },
             },
             required: ["testCaseKey", "steps"],
