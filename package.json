@@ -23,9 +23,9 @@
     "@modelcontextprotocol/sdk": "^1.17.3"
   },
   "devDependencies": {
+    "typescript": "^5.9.2",
     "@types/bun": "^1.2.20",
     "@types/node": "^24.3.0",
-    "typescript": "^5.8.3",
     "vite": "^7.1.2",
     "vitest": "^3.2.4"
   },
