@@ -20,7 +20,7 @@
   "author": "Dimosthenis Kaponis",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.3"
+    "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
     "typescript": "^5.9.2",
